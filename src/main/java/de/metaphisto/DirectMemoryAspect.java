@@ -18,7 +18,15 @@ public class DirectMemoryAspect {
 
     @Before("call(* java.nio.ByteBuffer.allocateDirect(..))")
     public void directMemoryAllocation(JoinPoint joinPoint) throws Throwable {
+        printInformation();
+    }
 
+    @Before("call(* java.nio.channels.FileChannel.map(..))")
+    public void memoryMapFile(JoinPoint joinPoint) {
+        printInformation();
+    }
+
+    private void printInformation() {
         //ignore allocations during warmup
         if (System.currentTimeMillis() > (START_TIME + TEN_SECONDS)) {
             StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -30,8 +38,5 @@ public class DirectMemoryAspect {
             }
             System.out.println(stringBuilder.toString());
         }
-
-        //TODO: add more pointcuts (for filechannel.map(), Unsafe, ...)
     }
-
 }
